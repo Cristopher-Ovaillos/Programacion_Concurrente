@@ -1,0 +1,76 @@
+import java.util.Scanner;
+
+public class Trapecio {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+System.out.print("  s ");
+//espaciado
+System.out.print("\t");
+//salto
+System.out.print("\n");
+
+        double m, n, a, b, c, d, h, k;
+
+        System.out.println("Ingrese m");
+        m = sc.nextDouble();
+        System.out.println("Ingrese n");
+        n = sc.nextDouble();
+        System.out.println("Ingrese R=[a,b]x[c,d]");
+        a = sc.nextDouble();
+        System.out.println("Ingrese R=[" + a + ",b]x[c,d]");
+        b = sc.nextDouble();
+        System.out.println("Ingrese R=[" + a + "," + b + "]x[c,d]");
+        c = sc.nextDouble();
+        System.out.println("Ingrese R=[" + a + "," + b + "]x[" + c + ",d]");
+        d = sc.nextDouble();
+        System.out.println("Ingrese R=[" + a + "," + b + "]x[" + c + "," + d + "]");
+        // h
+        h = (b - a) / m;
+        // k
+        k = (d - c) / n;
+        Double total = realizar(h, m, k, n);
+        System.out.println(total);
+
+        // lo hago por fila (osea va variando x e y se mantiene constante hasta que
+        // termino luego este aumenta al pasar a la siguiente fila)
+        // i para las columnan j para filas
+    }
+
+    private static double ingresarFormula(Double x, double y) {
+        return (Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    private static double realizar(double h, double m, double k, double n) {
+        double total = 0;
+        double acum = 0;
+System.out.println("");
+        for (int i = 0; i <= m; i++) {
+
+            for (int j = 0; j <= n; j++) {
+                System.out.print("f("+j + "," + i + ")=" + ingresarFormula(j * h, i * k));
+                System.out.print("\t");
+                if (j == 0 || j == n) {
+                    acum = acum + ingresarFormula(j * h, i * k);
+                } else {
+                    acum = acum + 2 * ingresarFormula(j * h, i * k);
+                }
+
+            }
+            System.out.print("\n");
+            if (i == 0 || i == m) {
+                total = total + ((h / 2) * (acum));
+            } else {
+                total = total + 2 * ((h / 2) * (acum));
+            }
+            acum = 0;
+
+        }
+        System.out.println();
+        total = (k / 2) * (total);
+
+        return total;
+
+    }
+
+}
