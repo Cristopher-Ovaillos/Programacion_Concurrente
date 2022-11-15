@@ -23,7 +23,7 @@ public class Cuerda {
     public void esperarQuePasenDer() throws InterruptedException {
         simulaSync.acquire();// tomo la llave
         while (puedenPasarDer) {
-            simulaSync.release();// "simulaSync"
+            simulaSync.release();// "simulaSync" libero para que pase otro babuino (sin esto el semaforo de abajo si no tiene permiso lo va a estar bloqueando el semaforo de simulaSync)
             lugarCuerdaDer.acquire();// espera
             simulaSync.acquire();
 
@@ -49,7 +49,7 @@ public class Cuerda {
     public void esperarQuePasenIzq() throws InterruptedException {
         simulaSync.acquire();// tomo la llave
         while (puedenPasarIzq) {
-            simulaSync.release();// "simulaSync"
+            simulaSync.release();// "simulaSync" libero para que pase otro babuino (sin esto el semaforo de abajo si no tiene permiso lo va a estar bloqueando el semaforo de simulaSync)
             lugarCuerdaIzq.acquire();// espera
             simulaSync.acquire();
 
