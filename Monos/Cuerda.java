@@ -101,57 +101,5 @@ public class Cuerda {
         }
         terminar.release();
     }
-/*
- *  public void pasaCuerda() throws InterruptedException {
-        terminar.acquire();
-        Random x = new Random();
-        int i = x.nextInt(2);
-        simulaSync.acquire();
-        contSubidos--;
-        System.out.println("el Babuino termina de pasar");
-        simulaSync.release();
-        if (contSubidos == 0) {
-            int permisosDer = 0, permisosIzq = 0;
-            avisarBloqueo = true;
-            puedenPasarDer = false;
-            puedenPasarIzq = false;
-            // luego libero a un babuino
-            while (permisosDer != 5 && totalBabuinosDer != 0) {
-                permisosDer++;
-                totalBabuinosDer--;
-               
-            }
-            // darPermisoParaizquierdo
-            while (permisosIzq != 5 && totalBabuinosIzq != 0) {
-                permisosIzq++;
-                totalBabuinosIzq--;
-            }
-            if (i == 0) {
-                if (noDarPermisosDer) {
-                    lugarCuerdaDer.release(permisosDer);
-                    totalBabuinosIzq=totalBabuinosIzq+permisosIzq;
-                } else {
-                    lugarCuerdaIzq.release(permisosIzq);
-                }
-                if (totalBabuinosDer == 0) {
-                    noDarPermisosDer = false;
-                }
-            } else {
-                if (noDarPermisosIzq) {
-                    lugarCuerdaIzq.release(permisosIzq);
-                    totalBabuinosDer=totalBabuinosDer+permisosDer;
-                } else {
-                    lugarCuerdaDer.release(permisosDer);
-                }
-                if (totalBabuinosIzq == 0) {
-                    noDarPermisosIzq = false;
-                }
-            }
-       
-        }
-        terminar.release();
-    }
- * 
- */
 }
 
