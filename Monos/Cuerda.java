@@ -8,8 +8,7 @@ public class Cuerda {
     private int contSubidos, totalBabuinosDer, totalBabuinosIzq;
     private final int TOTAL_CUERDA = 5;
     private Semaphore terminar, simulaSync, lugarCuerdaDer, lugarCuerdaIzq;
-    private boolean puedenPasarDer = false, puedenPasarIzq = false, avisarBloqueo = true, solo1vez = true,
-            noDarPermisosIzq = true, noDarPermisosDer = true;
+    private boolean puedenPasarDer = false, puedenPasarIzq = false, avisarBloqueo = true;
 
     public Cuerda(int der, int izq) {
         totalBabuinosDer = der;
@@ -26,14 +25,10 @@ public class Cuerda {
         while (puedenPasarDer) {
             simulaSync.release();// "simulaSync"
             lugarCuerdaDer.acquire();// espera
-
             simulaSync.acquire();
 
         }
-        if (solo1vez) {
-           // totalBabuinosDer = totalBabuinosDer - 5;
-            solo1vez = false;
-        }
+             
 
         System.out.println("El babuino " + Thread.currentThread().getName() + " intenta pasar (DER A IZQ) ");
         if (avisarBloqueo) {
@@ -59,10 +54,7 @@ public class Cuerda {
             simulaSync.acquire();
 
         }
-        if (solo1vez) {
-            //totalBabuinosIzq = totalBabuinosIzq - 5;
-            solo1vez = false;
-        }
+        
         System.out.println("El babuino " + Thread.currentThread().getName() + " intenta pasar (IZQ-DER)   ");
         if (avisarBloqueo) {
             // solo el primero que entra es el que avisa y como tiene la llave de
@@ -94,15 +86,16 @@ public class Cuerda {
             puedenPasarDer = false;
             puedenPasarIzq = false;
             // luego libero a un babuino
-            if (i == 0) {
+
+            //if (i == 0) {
                
                     lugarCuerdaDer.release(5);
                  
-            } else {
+            //} else {
                
                     lugarCuerdaIzq.release(5);
              
-            }
+            //}
        
 
         }
@@ -117,14 +110,12 @@ public class Cuerda {
         contSubidos--;
         System.out.println("el Babuino termina de pasar");
         simulaSync.release();
-
         if (contSubidos == 0) {
             int permisosDer = 0, permisosIzq = 0;
             avisarBloqueo = true;
             puedenPasarDer = false;
             puedenPasarIzq = false;
             // luego libero a un babuino
-
             while (permisosDer != 5 && totalBabuinosDer != 0) {
                 permisosDer++;
                 totalBabuinosDer--;
@@ -135,7 +126,6 @@ public class Cuerda {
                 permisosIzq++;
                 totalBabuinosIzq--;
             }
-
             if (i == 0) {
                 if (noDarPermisosDer) {
                     lugarCuerdaDer.release(permisosDer);
@@ -158,11 +148,10 @@ public class Cuerda {
                 }
             }
        
-
         }
         terminar.release();
     }
-
  * 
  */
 }
+
