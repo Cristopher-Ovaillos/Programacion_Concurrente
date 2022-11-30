@@ -11,47 +11,50 @@ public class Cola {
 
     private Lock extraer = new ReentrantLock();
     private Lock insertar = new ReentrantLock();
-    private Lock etiqueta = new ReentrantLock();
-    private Queue<String> cola1 = new LinkedList<>();
-    private Queue<String> cola2 = new LinkedList<>();
+    private Queue<Object> cola1 = new LinkedList<>();
+    private Queue<Object> cola2 = new LinkedList<>();
     private boolean etiqueta1;
-    private Condition c;
+    private Condition esperar;
+    private int hayElementos;
     // se cambia la etiqueta solo cuando este esta vacia osea la cola
     // correspondiente despues de extraer
 
     public Cola() {
 
-        etiqueta1 = false;// false para extraer cola 1  entonces cola 2 inserta //true para insertar cola 1 entonces extrae cola2
-        c= insertar.newCondition();
+        etiqueta1 = true;// false para extraer cola 1  entonces cola 2 inserta //true para insertar cola 1 entonces extrae cola2
+        esperar= insertar.newCondition();
+        hayElementos=0;
+        esperar= extraer.newCondition();
       
     }
 
-    public  String extraer() throws InterruptedException {
-        String dato="";
+    public  Object extraer() throws InterruptedException {
+        Object dato;
+        
         extraer.lock();
-      
-        if (!etiqueta1) {
-            // la cola 1 es la extrae
-            if (cola1.isEmpty()) {
-                // si esta vacia se hace el cambio
-                cambiarEtiqueta();
-             
-            }else{
-                dato=cola1.poll();
-                System.out.println("Se elimino un elemento de la cola 1");
+        while(hayElementos==0){
+            esperar.await();
+        }     
+        if(etiqueta1){
+
+            if(cola2.isEmpty()){//esta vacia
+                this.cambiarEtiqueta(2);
             }
-        } else {
-            // la cola 2 es la extrae
-            if (cola2.isEmpty()) {
-                // si esta vacia se hace el cambio
-                cambiarEtiqueta();
-                //cambia la etiqueta y como esta vacia no va a  poder extraer hasta que se inserte un elemento en la cola 2
-            
-            }else{
-                dato=cola2.poll();
-            System.out.println("Se elimino un elemento de la cola 2");
+    
+        }else{
+            if(cola1.isEmpty()){//esta vacia
+                this.cambiarEtiqueta(1);
             }
         }
+    
+        if(etiqueta1){
+            dato=cola2.poll();
+            System.out.println("Se elimino un elemento de la cola 2");
+        }else{
+            dato=cola1.poll();
+            System.out.println("Se elimino un elemento de la cola 1");
+        }
+    
         extraer.unlock();
         return dato;
     }
@@ -69,25 +72,20 @@ public class Cola {
             cola2.add(dato);
             System.out.println("se inserto en la cola 2");
          
-        }
-  
-        
+        }   
         //ya se inserto un elemento en alguna cola
-    
-
+        hayElementos++;
         insertar.unlock();
+        extraer.lock();
+        esperar.signal();
+        extraer.unlock();
     }
 
-    public void cambiarEtiqueta() {
-        etiqueta.lock();
-        if (etiqueta1 == true) {
-            // si la etiqueta 1 esta extrae ahora debe insertar
-            etiqueta1 = false;
-
-        } else {
-            etiqueta1 = true;
-        }
-        etiqueta.unlock();
+    public void cambiarEtiqueta(int i) {
+        insertar.lock();
+        System.out.println("    se oscilo porque la cola "+i+" estaba vacia.");
+        etiqueta1=!etiqueta1;
+        insertar.unlock();
     }
 
 }

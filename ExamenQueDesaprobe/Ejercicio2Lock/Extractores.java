@@ -13,8 +13,8 @@ public class Extractores extends Thread  {
 
         while(true){
             try {
-                String cad=a.extraer();
-                System.out.println(cad);
+                Object cad=a.extraer();
+                System.out.println("    "+cad);
                 
 
                 Thread.sleep(1000);
