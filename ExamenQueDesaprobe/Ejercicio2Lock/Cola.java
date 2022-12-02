@@ -11,6 +11,7 @@ public class Cola {
 
     private Lock extraer = new ReentrantLock();
     private Lock insertar = new ReentrantLock();
+    private Lock elem=new ReentrantLock();
     private Queue<Object> cola1 = new LinkedList<>();
     private Queue<Object> cola2 = new LinkedList<>();
     private boolean etiqueta1;
@@ -32,17 +33,19 @@ public class Cola {
         Object dato;
         
         extraer.lock();
-        while(hayElementos==0){
+        while(this.hayElementos()){
             esperar.await();
         }     
         if(etiqueta1){
 
             if(cola2.isEmpty()){//esta vacia
+                //para cambiar la etiqueta debo tener los 2 lock el de extraer y el de insertar
                 this.cambiarEtiqueta(2);
             }
     
         }else{
             if(cola1.isEmpty()){//esta vacia
+                 //para cambiar la etiqueta debo tener los 2 lock el de extraer y el de insertar
                 this.cambiarEtiqueta(1);
             }
         }
@@ -54,12 +57,13 @@ public class Cola {
             dato=cola1.poll();
             System.out.println("Se elimino un elemento de la cola 1");
         }
-    
+        //se saco un elementos
+        this.restarVariable();
         extraer.unlock();
         return dato;
     }
 
-    public void insertar(String dato) {
+    public void insertar(String dato) throws InterruptedException {
         insertar.lock();
 
         if (etiqueta1) {
@@ -74,8 +78,10 @@ public class Cola {
          
         }   
         //ya se inserto un elemento en alguna cola
-        hayElementos++;
+        this.sumarVariable();
         insertar.unlock();
+
+        //para avisar debo tener el lock de esa condicion
         extraer.lock();
         esperar.signal();
         extraer.unlock();
@@ -85,7 +91,30 @@ public class Cola {
         insertar.lock();
         System.out.println("    se oscilo porque la cola "+i+" estaba vacia.");
         etiqueta1=!etiqueta1;
+        System.out.println("COLA 1 "+ cola1.toString());
+        System.out.println("COLA 2 "+ cola2.toString());
         insertar.unlock();
+    }
+    private boolean hayElementos()throws InterruptedException{
+        boolean retornar;
+        elem.lock();
+        retornar=hayElementos==0;
+        elem.unlock();
+     
+       return retornar;
+    }
+
+    private void sumarVariable()throws InterruptedException{
+        elem.lock();
+        hayElementos++;
+        elem.unlock();
+    }
+
+    private void restarVariable()throws InterruptedException{
+        elem.lock();
+        hayElementos--;
+        elem.unlock();
+        
     }
 
 }

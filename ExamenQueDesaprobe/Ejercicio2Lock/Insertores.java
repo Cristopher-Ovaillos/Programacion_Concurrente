@@ -11,8 +11,9 @@ public class Insertores extends Thread {
     public void run(){
 
         while(true){
-            a.insertar("Dato del insertor "+Thread.currentThread().getName());
+          
             try {
+                a.insertar("C "+Thread.currentThread().getName());
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block

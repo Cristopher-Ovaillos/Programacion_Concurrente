@@ -11,11 +11,8 @@ public class Parque {
     private int max = 50;
     private int genteEnParque, genteR;
 
-    private Lock gente = new ReentrantLock();
-    private Lock realizarCola = new ReentrantLock();
+    private Lock gente = new ReentrantLock(true);
     private Condition genteEsperando, prioridadResidente;
-    private Queue<String> cola = new LinkedList<>();
-
     public Parque() {
         genteEnParque = 0;
         genteR = 0;
@@ -32,9 +29,12 @@ public class Parque {
             if (residente) {
                 genteR++;
                 prioridadResidente.await();
+                genteR--;
             } else {
                 genteEsperando.await();
             }
+            //si fue avisado es porque un weon salio del parque
+            genteEnParque--;
         }
         genteEnParque++;
         System.out.println(Thread.currentThread().getName() + " entra al parque " + genteEnParque + "/50");
@@ -45,14 +45,13 @@ public class Parque {
         gente.lock();
 
         System.out.println(Thread.currentThread().getName() + " sale del parque ");
+      
         if (genteR != 0) {
             // osea hay algun residente
-            genteR--;
             prioridadResidente.signal();
         } else {
             genteEsperando.signal();
         }
-        genteEnParque--;
         gente.unlock();
     }
 

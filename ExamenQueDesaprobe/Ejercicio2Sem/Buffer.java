@@ -1,73 +1,76 @@
+
 package ExamenQueDesaprobe.Ejercicio2Sem;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
-public class Buffer{
+public class Buffer {
+    public static final String YELLOW = "\u001B[33m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String RED = "\u001B[31m";
+    private Semaphore insertar;
+    private Semaphore extraer;
+    private Semaphore hayElementos;
+    private Queue<Object> cola1 = new LinkedList<>();
+    private final Queue<Object> cola2 = new LinkedList();
 
-private Semaphore insertar;
-private Semaphore extraer;
-private Semaphore hayElementos;
-private Queue<Object> cola1= new LinkedList();
-private Queue<Object> cola2= new LinkedList();
-private boolean etiqueta;
+    private boolean etiqueta;
 
-public Buffer(){
-    insertar= new Semaphore(1);
-    extraer= new Semaphore(1);
-    hayElementos= new Semaphore(0);
-    etiqueta=true;
+    public Buffer() {
+        insertar = new Semaphore(1);
+        extraer = new Semaphore(1);
+        hayElementos = new Semaphore(0);
+        etiqueta = true;
 
-}
-public void inserta(Object elem) throws InterruptedException{
-    insertar.acquire();
-
-    if(etiqueta){//etiqueta=true cola 1 inserta y cola 2 extrae
-        cola1.add(elem);
-        System.out.println("se inserto en la cola 1");
-    }else{
-        cola2.add(elem);
-        System.out.println("se inserto en la cola 2");
     }
-    insertar.release();
-    hayElementos.release();
-}
 
+    public void inserta(Object elem) throws InterruptedException {
+        insertar.acquire();
 
-public Object extraer() throws InterruptedException{
-    Object retornar;
-    hayElementos.acquire();
-    extraer.acquire();
-    if(etiqueta){
+        if (etiqueta) {// etiqueta=true cola 1 inserta y cola 2 extrae
+            cola1.add(elem);
+            System.out.println(GREEN + "se inserto en la cola 1");
+        } else {
+            cola2.add(elem);
+            System.out.println(GREEN + "se inserto en la cola 2");
+        }
+        insertar.release();
+        hayElementos.release();
+    }
 
-        if(cola2.isEmpty()){//esta vacia
-            this.oscilar(2);
+    public Object extraer() throws InterruptedException {
+        Object retornar;
+        hayElementos.acquire();
+        extraer.acquire();
+        if (etiqueta) {
+
+            if (cola2.isEmpty()) {// esta vacia
+                this.oscilar(2);
+            }
+
+        } else {
+            if (cola1.isEmpty()) {// esta vacia
+                this.oscilar(1);
+            }
         }
 
-    }else{
-        if(cola1.isEmpty()){//esta vacia
-            this.oscilar(1);
+        if (etiqueta) {
+            retornar = cola2.poll();
+            System.out.println(RED + "Se elimino un elemento de la cola 2");
+        } else {
+            retornar = cola1.poll();
+            System.out.println(RED + "Se elimino un elemento de la cola 1");
         }
+
+        extraer.release();
+        return retornar;
     }
 
-    if(etiqueta){
-        retornar=cola2.poll();
-        System.out.println("Se elimino un elemento de la cola 2");
-    }else{
-        retornar=cola1.poll();
-        System.out.println("Se elimino un elemento de la cola 1");
+    private void oscilar(int i) throws InterruptedException {
+        insertar.acquire();
+        System.out.println(YELLOW + "    se oscilo porque la cola " + i + " estaba vacia.");
+        etiqueta = !etiqueta;
+        insertar.release();
     }
-
-
-    extraer.release();
-    return retornar;
-}
-
-private void oscilar(int i) throws InterruptedException{
-    insertar.acquire();
-System.out.println("    se oscilo porque la cola "+i+" estaba vacia.");
-    etiqueta=!etiqueta;
-    insertar.release();
-}
 }

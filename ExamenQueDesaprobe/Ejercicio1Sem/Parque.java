@@ -26,12 +26,14 @@ public class Parque {
             if (res) {
                 genteR++;
                 residente.acquire();
+                genteR--;
             } else {
                 noResidente.acquire();
             }
             mutex.acquire();
+            genteEnParque--;
         }
-
+       
         genteEnParque++;
         System.out.println(Thread.currentThread().getName() + " entra al parque (" + genteEnParque + "/50)");
 
@@ -43,13 +45,12 @@ public class Parque {
         System.out.println(Thread.currentThread().getName() + " sale del parque ");
         if (genteR != 0) {
             // osea hay residentes
-            genteR--;
             residente.release();
         } else {
             // no hay residentes
             noResidente.release();
         }
-        genteEnParque--;
+       
         mutex.release();
     }
 }
