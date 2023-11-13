@@ -23,7 +23,7 @@ public class Cola {
     public Cola() {
 
         etiqueta1 = true;// false para extraer cola 1  entonces cola 2 inserta //true para insertar cola 1 entonces extrae cola2
-        esperar= insertar.newCondition();
+        //esperar= insertar.newCondition();
         hayElementos=0;
         esperar= extraer.newCondition();
       
